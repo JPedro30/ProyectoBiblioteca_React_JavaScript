@@ -1,4 +1,4 @@
-export default function DetalleLibro({ libro, volverInicio, irAEditar }) {
+export default function DetalleLibro({ libro, volverInicio, irAEditar, isAdmin }) {
 
   const handleEliminar = () => {
     const confirmar = window.confirm(`¿Seguro que quieres eliminar "${libro.titulo}"?`);
@@ -73,7 +73,8 @@ export default function DetalleLibro({ libro, volverInicio, irAEditar }) {
               <button onClick={handleEliminar} className="w-full md:w-auto px-5 py-2.5 bg-red-800 hover:bg-red-700 rounded-lg text-white font-bold shadow-lg shadow-red-900/30 transition-colors mt-2 md:mt-0">
                 Eliminar
               </button>
-            </>)}s
+            </>
+          )} 
         </div>
       </div>
 
