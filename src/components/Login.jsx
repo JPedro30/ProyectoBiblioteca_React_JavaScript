@@ -8,18 +8,26 @@ export default function Login({ setToken, setVista }) {
 
   const manejarLogin = async (e) => {
     e.preventDefault();
-    
-    // Aquí es donde luego haremos el fetch a tu Spring Boot.
-    // Por ahora, para que puedas probar que la interfaz cambia, 
-    // ponemos un usuario "admin" y clave "1234" de prueba temporalmente.
-    
-    if (usuario === 'admin' && password === '1234') {
-      const tokenFalso = "token_de_prueba_12345";
-      localStorage.setItem('token', tokenFalso);
-      setToken(tokenFalso);
-      setVista('estanteria'); // Volvemos al inicio al loguearnos
-    } else {
-      setError('Credenciales incorrectas');
+    setError('');
+
+    try {
+      const respuesta = await fetch('https://backendbiblioteca-j3k0.onrender.com/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, password })
+      });
+
+      if (respuesta.ok) {
+        const datos = await respuesta.json();
+        // Guardamos el token real que nos manda Spring Boot
+        localStorage.setItem('token', datos.token);
+        setToken(datos.token);
+        setVista('estanteria');
+      } else {
+        setError('Credenciales incorrectas');
+      }
+    } catch (error) {
+      setError('Error al conectar con el servidor');
     }
   };
 

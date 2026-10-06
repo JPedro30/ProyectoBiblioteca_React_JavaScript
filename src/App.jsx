@@ -7,7 +7,7 @@ import LibroCard from './components/LibroCard'
 import FormularioLibro from './components/FormularioLibro'
 import DetalleLibro from './components/DetalleLibro'
 import BusquedaLibros from './components/BusquedaLibros'
-import Login from './components/Login' // Necesitaremos crear este componente pronto
+import Login from './components/login'
 
 function App() {
   const [vista, setVista] = useState('estanteria'); 
@@ -23,7 +23,7 @@ function App() {
   // --- NUEVO: Inicializar Google Analytics ---
   useEffect(() => {
     // Cuando tengas tu cuenta de Analytics, cambia esto por tu ID real (G-XXXXXXXXXX)
-    ReactGA.initialize("G-XXXXXXXXXX"); 
+    ReactGA.initialize("G-8EP2HVN97D"); 
   }, []);
 
   // --- NUEVO: Rastrear vistas de pantalla en Analytics ---
