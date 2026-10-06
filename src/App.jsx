@@ -1,11 +1,13 @@
 // src/App.jsx
 import { useState, useEffect } from 'react';
+import ReactGA from "react-ga4";
 import './App.css'
 import NavBar from './components/NavBar'
 import LibroCard from './components/LibroCard'
 import FormularioLibro from './components/FormularioLibro'
 import DetalleLibro from './components/DetalleLibro'
 import BusquedaLibros from './components/BusquedaLibros'
+import Login from './components/Login' // Necesitaremos crear este componente pronto
 
 function App() {
   const [vista, setVista] = useState('estanteria'); 
@@ -13,6 +15,21 @@ function App() {
   const [cargando, setCargando] = useState(true);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
   const [letraActiva, setLetraActiva] = useState('Todos');
+
+  // --- NUEVO: Estado de autenticación ---
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const isAdmin = token !== null; // Si hay token guardado, es admin
+
+  // --- NUEVO: Inicializar Google Analytics ---
+  useEffect(() => {
+    // Cuando tengas tu cuenta de Analytics, cambia esto por tu ID real (G-XXXXXXXXXX)
+    ReactGA.initialize("G-XXXXXXXXXX"); 
+  }, []);
+
+  // --- NUEVO: Rastrear vistas de pantalla en Analytics ---
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: `/${vista}` });
+  }, [vista]);
 
   const abecedario = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
 
@@ -40,6 +57,13 @@ function App() {
     setVista('detalle');
   };
 
+  // --- NUEVO: Función para cerrar sesión ---
+  const cerrarSesion = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setVista('estanteria');
+  };
+
   return (
     // 1. EL FONDO: bg-[#F4EBE1] (pergamino/madera clara) y texto text-amber-950. Añadimos overflow-hidden.
     <div className="min-h-screen bg-[#F4EBE1] flex flex-col relative text-amber-950">
@@ -50,11 +74,16 @@ function App() {
 
       {/* 3. EL CONTENIDO PRINCIPAL (Con z-10 para estar por encima de las hojas) */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        <NavBar setVista={setVista} />
+        {/* Pasamos isAdmin y cerrarSesion al NavBar */}
+        <NavBar 
+          setVista={setVista} 
+          isAdmin={isAdmin} 
+          cerrarSesion={cerrarSesion} 
+        />
 
         <main className="flex-1 w-full px-2 py-10 flex flex-col items-center">
           
-          {/* ⏳ ESTADO 1: CARGANDO LA ESTANTERÍA (Adaptado a tonos madera/dorados) */}
+          {/* ⏳ ESTADO 1: CARGANDO LA ESTANTERÍA */}
           {vista === 'estanteria' && cargando && (
             <div className="flex flex-col items-center justify-center h-[60vh] px-4 text-center">
               <div className="w-16 h-16 border-4 border-amber-900/20 border-t-amber-600 rounded-full animate-spin shadow-[0_0_15px_rgba(217,119,6,0.5)] mb-6"></div>
@@ -72,7 +101,7 @@ function App() {
           {vista === 'estanteria' && !cargando && (
             <div className="w-full max-w-400 flex flex-col min-h-full">
               
-              {/* Aviso si la letra no tiene libros (color actualizado) */}
+              {/* Aviso si la letra no tiene libros */}
               {libros.length === 0 && (
                 <p className="text-center text-amber-900/70 font-medium text-xl mb-10">
                   No hay libros que empiecen por la letra "{letraActiva}".
@@ -86,7 +115,7 @@ function App() {
                 ))}
               </div>
 
-              {/* 2. GLOSARIO A-Z (Ahora usa colores de madera oscura y botones ámbar) */}
+              {/* 2. GLOSARIO A-Z */}
               <div className="sticky bottom-6 w-full max-w-4xl mx-auto z-40 mt-auto">
                 <div className="no-scrollbar flex flex-nowrap overflow-x-auto justify-start xl:justify-center gap-2 bg-amber-950/85 backdrop-blur-md p-3 rounded-2xl shadow-2xl shadow-amber-950/40 border border-amber-800/50">
                   
@@ -114,11 +143,18 @@ function App() {
             </div>
           )}
 
-          {/* RESTO DE VISTAS (Aquí no sale el glosario ni afecta el cargando) */}
-          {vista === 'detalle' && <DetalleLibro libro={libroSeleccionado} volverInicio={() => setVista('estanteria')} irAEditar={() => setVista('editar')} />}
-          {vista === 'formulario' && <FormularioLibro volverInicio={() => setVista('estanteria')} />}
-          {vista === 'editar' && <FormularioLibro volverInicio={() => setVista('estanteria')} libroAEditar={libroSeleccionado} />}
+          {/* VISTAS MODIFICADAS: Añadido isAdmin y token por seguridad */}
+          {vista === 'detalle' && <DetalleLibro libro={libroSeleccionado} volverInicio={() => setVista('estanteria')} irAEditar={() => setVista('editar')} isAdmin={isAdmin} />}
+          
+          {/* Protección de rutas: Si no es admin y llega aquí, le enseñamos un mensaje o lo bloqueamos */}
+          {vista === 'formulario' && (isAdmin ? <FormularioLibro volverInicio={() => setVista('estanteria')} token={token} /> : <div className="mt-20 font-bold text-amber-800 text-xl">Acceso denegado. Solo administradores.</div>)}
+          
+          {vista === 'editar' && (isAdmin ? <FormularioLibro volverInicio={() => setVista('estanteria')} libroAEditar={libroSeleccionado} token={token} /> : <div className="mt-20 font-bold text-amber-800 text-xl">Acceso denegado. Solo administradores.</div>)}
+          
           {vista === 'busqueda' && <BusquedaLibros verDetalle={verDetalle} />}
+          
+          {/* NUEVA VISTA DE LOGIN */}
+          {vista === 'login' && <Login setToken={setToken} setVista={setVista} />}
 
         </main>
       </div>
