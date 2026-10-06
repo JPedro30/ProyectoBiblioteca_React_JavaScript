@@ -65,12 +65,15 @@ export default function DetalleLibro({ libro, volverInicio, irAEditar }) {
           <button onClick={volverInicio} className="flex-1 md:flex-none px-5 py-2.5 bg-amber-900 hover:bg-amber-800 border border-amber-800 rounded-lg text-amber-200 font-bold transition-colors">
             Volver
           </button>
-          <button onClick={irAEditar} className="flex-1 md:flex-none px-5 py-2.5 bg-amber-600 hover:bg-amber-500 rounded-lg text-amber-50 font-bold shadow-lg shadow-amber-600/30 transition-colors">
-            Editar
-          </button>
-          <button onClick={handleEliminar} className="w-full md:w-auto px-5 py-2.5 bg-red-800 hover:bg-red-700 rounded-lg text-white font-bold shadow-lg shadow-red-900/30 transition-colors mt-2 md:mt-0">
-            Eliminar
-          </button>
+          {isAdmin && (
+            <>
+              <button onClick={irAEditar} className="flex-1 md:flex-none px-5 py-2.5 bg-amber-600 hover:bg-amber-500 rounded-lg text-amber-50 font-bold shadow-lg shadow-amber-600/30 transition-colors">
+                Editar
+              </button>
+              <button onClick={handleEliminar} className="w-full md:w-auto px-5 py-2.5 bg-red-800 hover:bg-red-700 rounded-lg text-white font-bold shadow-lg shadow-red-900/30 transition-colors mt-2 md:mt-0">
+                Eliminar
+              </button>
+            </>)}s
         </div>
       </div>
 
