@@ -7,7 +7,7 @@ import LibroCard from './components/LibroCard'
 import FormularioLibro from './components/FormularioLibro'
 import DetalleLibro from './components/DetalleLibro'
 import BusquedaLibros from './components/BusquedaLibros'
-import Login from './components/login'
+import Login from './components/ComponentLogin'
 
 function App() {
   const [vista, setVista] = useState('estanteria'); 
